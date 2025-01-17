@@ -6,8 +6,7 @@ const state = {
   events: [],
 }
 
-// Asks API to get events
-// Update state.events with events from the API
+// Asks API to retrieve events and save locally to state.events
 async function getEvents() {
   try {
     const response = await fetch(API_URL);
@@ -22,8 +21,17 @@ async function getEvents() {
 }
 
 // Asks API to create a new event based on the given `event` 
-function addEvent() {
-
+async function addEvent(event) {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(event)
+    })
+    const json = await response.json();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // Asks API to delete given `event`
@@ -54,3 +62,22 @@ async function render() {
 }
 
 render();
+
+const form = document.querySelector('form');
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  // Assign each value from the form
+  const eventToAdd = {
+    name: form.eventName.value,
+    description: form.eventDescription.value,
+    date: new Date(form.eventDate.value).toISOString(), // 
+    location: form.eventLocation.value,
+  }
+
+  // Add new event object
+  await addEvent(eventToAdd);
+
+  // Re render
+  render();
+})

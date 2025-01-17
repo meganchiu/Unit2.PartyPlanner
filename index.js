@@ -1,9 +1,14 @@
 const COHORT = "2410-FTB-ET-WEB-ABM";
 const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/events`;
 
+const RSVPS_API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/rsvps`;
+const GUESTS_API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/guests`;
+
 // Initialize events array
 const state = {
   events: [],
+  rsvps: [],
+  guests: []
 }
 
 // Asks API to retrieve events and save locally to state.events
@@ -12,7 +17,32 @@ async function getEvents() {
     const response = await fetch(API_URL);
     const data = await response.json();
     state.events = data.data;
-  } catch {
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Asks API to retrieve rsvps and save locally to state.rsvps
+async function getRsvps() {
+  try {
+    const response = await fetch(RSVPS_API_URL);
+    const data = await response.json();
+    state.rsvps = data.data;
+    console.log(state.rsvps);
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+// Asks API to retrieve guests and save locally to state.guests
+async function getGuests() {
+  try {
+    const response = await fetch(GUESTS_API_URL);
+    const data = await response.json();
+    state.guests = data.data;
+    console.log(state.guests);
+  } catch (error) {
     console.error(error);
   }
 }
@@ -82,6 +112,8 @@ function renderEvents() {
 // Syncs state.event with API and re renders
 async function render() {
   await getEvents();
+  await getRsvps();
+  await getGuests();
   renderEvents();
 }
 

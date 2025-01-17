@@ -25,6 +25,9 @@ async function addEvent(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(event)
     })
+    if (!response.ok) {
+      throw new Error('Unable to add the event.')
+    }
     const json = await response.json();
     // Re render
     render();
@@ -57,7 +60,7 @@ function renderEvents() {
       `<div id="${event.id}">
       <h1>Event Name: ${event.name}</h1>
       <p>${event.description}</p>
-      <p>Date: ${new Date(event.date)}</p>
+      <p>Date: ${event.date}</p>
       <p>Address: ${event.location}</p>
       </div>`;
     

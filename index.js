@@ -10,11 +10,8 @@ const state = {
 async function getEvents() {
   try {
     const response = await fetch(API_URL);
-    console.log(response);
     const data = await response.json();
-    console.log(data);
     state.events = data.data;
-    console.log(state.events);
   } catch {
     console.error(error);
   }
@@ -29,14 +26,27 @@ async function addEvent(event) {
       body: JSON.stringify(event)
     })
     const json = await response.json();
+    // Re render
+    render();
   } catch (error) {
     console.error(error);
   }
 }
 
 // Asks API to delete given `event`
-function deleteEvent() {
-
+async function deleteEvent(id) {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE"});
+    // Throw error if the deletion was unsuccessful
+    if (!response.ok) {
+      throw new Error('Unable to delete the event.');
+    }
+    // Re render
+    render();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // Renders events from state.event
@@ -45,12 +55,24 @@ function renderEvents() {
     console.log(`event ${event}`);
     const eventElement = document.createElement('li');
     eventElement.innerHTML = 
-      `<h1>${event.name}</h1>
+      `<div id="${event.id}">
+      <h1>${event.name}</h1>
       <p>${event.description}</p>
       <p>${event.date}</p>
-      <p>${event.location}</p>`;
+      <p>${event.location}</p>
+      </div>`;
+    
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = 'Delete Event';
+    eventElement.append(deleteButton);
+
+    deleteButton.addEventListener('click', () => {
+      deleteEvent(`${event.id}`);
+    });
+
     return eventElement;
   })
+
   const content = document.querySelector('#events');
   content.replaceChildren(...eventElements);
 }
@@ -60,6 +82,8 @@ async function render() {
   await getEvents();
   renderEvents();
 }
+
+// ***** SCRIPT *****
 
 render();
 
@@ -81,3 +105,4 @@ form.addEventListener('submit', async (event) => {
   // Re render
   render();
 })
+

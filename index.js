@@ -52,14 +52,13 @@ async function deleteEvent(id) {
 // Renders events from state.event
 function renderEvents() {
   const eventElements = state.events.map((event) => {
-    console.log(`event ${event}`);
     const eventElement = document.createElement('li');
     eventElement.innerHTML = 
       `<div id="${event.id}">
-      <h1>${event.name}</h1>
+      <h1>Event Name: ${event.name}</h1>
       <p>${event.description}</p>
-      <p>${event.date}</p>
-      <p>${event.location}</p>
+      <p>Date: ${new Date(event.date)}</p>
+      <p>Address: ${event.location}</p>
       </div>`;
     
     const deleteButton = document.createElement("button");
@@ -105,4 +104,3 @@ form.addEventListener('submit', async (event) => {
   // Re render
   render();
 })
-

@@ -56,10 +56,10 @@ async function addEvent(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(event)
     })
-    if (!response.ok) {
-      throw new Error('Unable to add the event.')
-    }
     const json = await response.json();
+    if (json.error) {
+      throw new Error(json.message);
+    }
     // Re render
     render();
   } catch (error) {

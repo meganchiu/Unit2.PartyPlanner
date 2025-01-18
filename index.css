@@ -1,5 +1,9 @@
 li {
   border: 1px solid black;
-  margin: 10px;
+  margin: 5px;
   padding: 10px;
+}
+
+ul li {
+  list-style: none;
 }

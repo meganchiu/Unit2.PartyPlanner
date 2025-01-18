@@ -17,6 +17,7 @@ async function getEvents() {
     const response = await fetch(API_URL);
     const data = await response.json();
     state.events = data.data;
+    // console.log(state.events);
   } catch (error) {
     console.error(error);
   }
@@ -28,7 +29,7 @@ async function getRsvps() {
     const response = await fetch(RSVPS_API_URL);
     const data = await response.json();
     state.rsvps = data.data;
-    console.log(state.rsvps);
+    // console.log(state.rsvps);
   }
   catch (error) {
     console.error(error);
@@ -86,14 +87,45 @@ async function deleteEvent(id) {
 function renderEvents() {
   const eventElements = state.events.map((event) => {
     const eventElement = document.createElement('li');
-    eventElement.innerHTML = 
+    const firstPart =       
       `<div id="${event.id}">
       <h1>Event Name: ${event.name}</h1>
       <p>${event.description}</p>
       <p>Date: ${event.date}</p>
       <p>Address: ${event.location}</p>
       </div>`;
-    
+    eventElement.innerHTML = firstPart;
+
+    let secondPart = "";
+    let rsvpsToEvent = [];
+    let guestArr = [];
+    // Find rsvps for each event
+    for (let elem of state.rsvps) {
+      if (elem.eventId == event.id) {
+        rsvpsToEvent.push(elem);
+      }
+    }
+    // Link guest to each rsvp of an event 
+    if (rsvpsToEvent.length > 0) {
+      for (let rsvp of rsvpsToEvent) {
+        for (let guest of state.guests) {
+          if (rsvp.guestId === guest.id) {
+            guestArr.push(guest);
+          }
+        }
+      }
+      const div = document.createElement('div');
+      for (let g of guestArr) {
+        let x = document.createElement('li');
+        x.textContent = `Guest: ${g.name}; Email: ${g.email}; Phone: ${g.phone}`;
+        div.appendChild(x);
+      }
+      secondPart = "<ol>" + div.innerHTML + "</ol>";
+    } else {
+      secondPart = `There are no guests for this event.<br><br>`
+    }
+    eventElement.innerHTML += secondPart;
+
     const deleteButton = document.createElement("button");
     deleteButton.textContent = 'Delete Event';
     eventElement.append(deleteButton);

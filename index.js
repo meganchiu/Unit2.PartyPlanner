@@ -28,7 +28,6 @@ async function getRsvps() {
     const response = await fetch(RSVPS_API_URL);
     const data = await response.json();
     state.rsvps = data.data;
-    // console.log(state.rsvps);
   }
   catch (error) {
     console.error(error);
@@ -41,7 +40,6 @@ async function getGuests() {
     const response = await fetch(GUESTS_API_URL);
     const data = await response.json();
     state.guests = data.data;
-    console.log(state.guests);
   } catch (error) {
     console.error(error);
   }
@@ -66,6 +64,7 @@ async function addEvent(event) {
   }
 }
 
+// Asks API to create (POST) a new guest based on the given `guest`
 async function addGuest(guest) {
   try {
     const response = await fetch(GUESTS_API_URL, {
@@ -83,46 +82,13 @@ async function addGuest(guest) {
   }
 }
 
+// Asks API to create (POST) a new RSVP based on the given `rsvp`
 async function addRsvps(rsvp) {
   try {
     const response = await fetch(RSVPS_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json"},
-      body: JSON.stringify(guest)
-    })
-    const json = await response.json();
-    if (json.error) {
-      throw new Error(json.message);
-    }
-    render();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function addGuest(guest) {
-  try {
-    const response = await fetch(GUESTS_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json"},
-      body: JSON.stringify(guest)
-    })
-    const json = await response.json();
-    if (json.error) {
-      throw new Error(json.message);
-    }
-    render();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function addRsvps(rsvp) {
-  try {
-    const response = await fetch(RSVPS_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json"},
-      body: JSON.stringify(guest)
+      body: JSON.stringify(rsvp)
     })
     const json = await response.json();
     if (json.error) {
@@ -150,15 +116,28 @@ async function deleteEvent(id) {
   }
 }
 
-function renderGuests() {
+// Renders dropdown for list of available guests
+function renderGuestsDropdown() {
   const guestElements = state.guests.map((guest) => {
     const guestElement = document.createElement('option');
     guestElement.innerHTML = guest.name;
-    guestElement.value = guest.name;
+    guestElement.value = guest.id;
     return guestElement;
   })
-  const content = document.querySelector('#guests');
+  const content = document.querySelector('#guestRsvp');
   content.replaceChildren(...guestElements);
+}
+
+// Renders dropdown for list of available events
+function renderEventsDropdown() {
+  const eventsDropdownElements = state.events.map((event) => {
+    const eventsDropdownElement = document.createElement('option');
+    eventsDropdownElement.innerHTML = event.name;
+    eventsDropdownElement.value = event.id;
+    return eventsDropdownElement;
+  })
+  const content = document.querySelector('#eventRsvp');
+  content.replaceChildren(...eventsDropdownElements);
 }
 
 // Renders events from state.event
@@ -224,8 +203,9 @@ async function render() {
   await getEvents();
   await getRsvps();
   await getGuests();
-  renderGuests();
-  renderEvents();
+  renderGuestsDropdown();
+  renderEventsDropdown();
+  renderEvents(); 
 }
 
 // ***** SCRIPT *****
@@ -279,3 +259,23 @@ form2.addEventListener('submit', async (event) => {
   // Re render
   render();
 })
+
+const form3 = document.querySelector('#addRsvp');
+form3.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  // Assign each value from the form
+  const guestId = Number(form3.guest.value);
+  const eventId = Number(form3.event.value);
+
+  const guestToRsvp = {
+    guestId: guestId,
+    eventId: eventId,
+  };
+
+  // Add new rsvps object
+  await addRsvps(guestToRsvp);
+
+  // Re render
+  render();
+});

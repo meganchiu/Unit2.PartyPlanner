@@ -4,26 +4,25 @@ const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/event
 const RSVPS_API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/rsvps`;
 const GUESTS_API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/guests`;
 
-// Initialize events array
+// Initialize evens, rsvps, guests arrays
 const state = {
   events: [],
   rsvps: [],
   guests: []
 }
 
-// Asks API to retrieve events and save locally to state.events
+// Asks API to retrieve (GET) events and save locally to state.events
 async function getEvents() {
   try {
     const response = await fetch(API_URL);
     const data = await response.json();
     state.events = data.data;
-    // console.log(state.events);
   } catch (error) {
     console.error(error);
   }
 }
 
-// Asks API to retrieve rsvps and save locally to state.rsvps
+// Asks API to retrieve (GET) rsvps and save locally to state.rsvps
 async function getRsvps() {
   try {
     const response = await fetch(RSVPS_API_URL);
@@ -36,7 +35,7 @@ async function getRsvps() {
   }
 }
 
-// Asks API to retrieve guests and save locally to state.guests
+// Asks API to retrieve (GET) guests and save locally to state.guests
 async function getGuests() {
   try {
     const response = await fetch(GUESTS_API_URL);
@@ -48,7 +47,7 @@ async function getGuests() {
   }
 }
 
-// Asks API to create a new event based on the given `event` 
+// Asks API to create (POST) a new event based on the given `event` 
 async function addEvent(event) {
   try {
     const response = await fetch(API_URL, {
@@ -101,7 +100,41 @@ async function addRsvps(rsvp) {
   }
 }
 
-// Asks API to delete given `event`
+async function addGuest(guest) {
+  try {
+    const response = await fetch(GUESTS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(guest)
+    })
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(json.message);
+    }
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function addRsvps(rsvp) {
+  try {
+    const response = await fetch(RSVPS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(guest)
+    })
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(json.message);
+    }
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Asks API to delete an event with the given id
 async function deleteEvent(id) {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
@@ -186,7 +219,7 @@ function renderEvents() {
   content.replaceChildren(...eventElements);
 }
 
-// Syncs state.event with API and re renders
+// Syncs state.event, state.rsvps, state.guests lol with API and re renders
 async function render() {
   await getEvents();
   await getRsvps();
@@ -203,7 +236,7 @@ const form1 = document.querySelector('#addEvent');
 form1.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  // Assign each value from the form
+  // Assign each value received from the form
   const eventToAdd = {
     name: form1.eventName.value,
     description: form1.eventDescription.value,

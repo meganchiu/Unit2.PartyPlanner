@@ -67,6 +67,40 @@ async function addEvent(event) {
   }
 }
 
+async function addGuest(guest) {
+  try {
+    const response = await fetch(GUESTS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(guest)
+    })
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(json.message);
+    }
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function addRsvps(rsvp) {
+  try {
+    const response = await fetch(RSVPS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(guest)
+    })
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(json.message);
+    }
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // Asks API to delete given `event`
 async function deleteEvent(id) {
   try {
@@ -81,6 +115,17 @@ async function deleteEvent(id) {
   } catch (error) {
     console.error(error);
   }
+}
+
+function renderGuests() {
+  const guestElements = state.guests.map((guest) => {
+    const guestElement = document.createElement('option');
+    guestElement.innerHTML = guest.name;
+    guestElement.value = guest.name;
+    return guestElement;
+  })
+  const content = document.querySelector('#guests');
+  content.replaceChildren(...guestElements);
 }
 
 // Renders events from state.event
@@ -146,6 +191,7 @@ async function render() {
   await getEvents();
   await getRsvps();
   await getGuests();
+  renderGuests();
   renderEvents();
 }
 
@@ -153,20 +199,49 @@ async function render() {
 
 render();
 
-const form = document.querySelector('form');
-form.addEventListener('submit', async (event) => {
+const form1 = document.querySelector('#addEvent');
+form1.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   // Assign each value from the form
   const eventToAdd = {
-    name: form.eventName.value,
-    description: form.eventDescription.value,
-    date: new Date(form.eventDate.value).toISOString(), // 
-    location: form.eventLocation.value,
+    name: form1.eventName.value,
+    description: form1.eventDescription.value,
+    date: new Date(form1.eventDate.value).toISOString(), // 
+    location: form1.eventLocation.value,
   }
 
   // Add new event object
   await addEvent(eventToAdd);
+
+  // Reset form after submission
+  form1.eventName.value = "";
+  form1.eventDescription.value = "";
+  form1.eventDate.value = "";
+  form1.eventLocation.value = "";
+
+  // Re render
+  render();
+})
+
+const form2 = document.querySelector('#addGuest');
+form2.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  // Assign each value from the form
+  const guestToAdd = {
+    name: form2.guestName.value,
+    email: form2.guestEmail.value,
+    phone: form2.guestPhone.value
+  }
+
+  // Add new event object
+  await addGuest(guestToAdd);
+
+  // Reset form after submission
+  form2.guestName.value = "";
+  form2.guestEmail.value = "";
+  form2.guestPhone.value = "";
 
   // Re render
   render();

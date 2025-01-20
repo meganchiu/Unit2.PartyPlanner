@@ -85,6 +85,7 @@ async function addGuest(guest) {
 // Asks API to create (POST) a new RSVP based on the given `rsvp`
 async function addRsvps(rsvp) {
   try {
+    // TODO: Add check to determine if the rsvp to be added already exists in state.rsvps
     const response = await fetch(RSVPS_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json"},
